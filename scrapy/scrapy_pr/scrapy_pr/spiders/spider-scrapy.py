@@ -4,7 +4,7 @@ import pandas as pd
 class CountrySpider(scrapy.Spider):
     name = 'country_spider'
     start_urls = ['http://data.un.org/']
-    ScrapMin100 = False  # Set this to False to get all links
+    ScrapMin100 = True  # Set this to False to get all links
     max_links = 100 if ScrapMin100 else None
     processed_links = 0
     linksList = []
@@ -58,12 +58,11 @@ class CountrySpider(scrapy.Spider):
         for i, indicator in enumerate(indicators):
             data[indicator] = 'NA'
             
+        
         # Create a dataframe for the country
         self.df = pd.DataFrame(data)
 
-        # Initialize data lists for each header
-        self.data = [[] for _ in self.headers]
-
+      
        
         rowData = dict()
         rows = response.xpath('//summary[text()="Economic indicators"]/following-sibling::table//tbody/tr')
@@ -76,6 +75,7 @@ class CountrySpider(scrapy.Spider):
                 values = [value.strip() if value.strip() != '...' else 'NA' for value in values]
                 rowData[indicator] = values
             
+        
 
         for i in range(len(header_years)):
             for indicator, values in rowData.items():

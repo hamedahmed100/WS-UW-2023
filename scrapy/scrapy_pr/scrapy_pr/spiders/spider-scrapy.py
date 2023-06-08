@@ -1,6 +1,5 @@
 import scrapy
 import pandas as pd
-import csv
 
 class CountrySpider(scrapy.Spider):
     name = 'country_spider'
@@ -77,8 +76,6 @@ class CountrySpider(scrapy.Spider):
                 values = [value.strip() if value.strip() != '...' else 'NA' for value in values]
                 rowData[indicator] = values
             
-        
-      
 
         for i in range(len(header_years)):
             for indicator, values in rowData.items():
@@ -94,6 +91,3 @@ class CountrySpider(scrapy.Spider):
         self.master_df.to_csv('countries.csv', index=False)
     def close(self, reason):
         self.output_csv()  # This will write the final DataFrame to a csv
-
-        
-

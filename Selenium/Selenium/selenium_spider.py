@@ -5,7 +5,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import pandas as pd
 from selenium.webdriver.remote.webelement import WebElement
-import csv
 from selenium.common.exceptions import NoSuchElementException
 from time import sleep
 
@@ -43,12 +42,9 @@ header_years = [2010,2015,2021]
 name = 'country_spider'
 start_urls = ['http://data.un.org/']
 ScrapMin100 = True  # Set this to False to get all links
-max_links = 100 if ScrapMin100 else None
+max_links = 10 if ScrapMin100 else None
 processed_links = 0
-linksList = []
-headers = []
-data = []
-df = pd.DataFrame()
+
 
 # Find country elements using XPath
 country_elements = driver.find_elements(By.XPATH, '//div[contains(@class, "CountryList")]//a[starts-with(@href, "en/iso")]')
@@ -64,8 +60,6 @@ for name in country_names:
     
     if max_links and processed_links >= max_links:
         break
-
-
 
 
 myDataFrame = pd.DataFrame()
@@ -109,7 +103,7 @@ for link in list_links:
                 
         myDataFrame= pd.DataFrame(data) 
 
-        # Write the data rows
+        
         # Write the data rows
         rowData = dict()
         for row in rows:

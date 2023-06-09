@@ -16,8 +16,6 @@ chrome_options.add_argument("--disable-feature=NotificationPrompts")
 chrome_options.add_argument("--disable-notifications")
 chrome_options.add_argument("--log-level=3")  # Suppress browser console output
 
-master_df = pd.DataFrame()
-
 
 # Set up the Chrome driver
 driver = webdriver.Chrome(options=chrome_options)
@@ -25,6 +23,16 @@ driver = webdriver.Chrome(options=chrome_options)
 # Navigate to the website
 driver.get("http://data.un.org/")
 
+
+
+
+master_df = pd.DataFrame()
+myDataFrame = pd.DataFrame()
+header_years = [2010,2015,2021]
+start_urls = ['http://data.un.org/']
+ScrapMin100 = True  # Set this to False to get all links
+max_links = 100 if ScrapMin100 else None
+processed_links = 0
 indicators = [
         'GDP: Gross domestic product',
         'GDP growth rate',
@@ -38,19 +46,12 @@ indicators = [
         'CPI: Consumer Price Index'
     ]
 
-header_years = [2010,2015,2021]
-start_urls = ['http://data.un.org/']
-ScrapMin100 = True  # Set this to False to get all links
-max_links = 100 if ScrapMin100 else None
-processed_links = 0
-
 
 # Find country elements using XPath
 country_elements = driver.find_elements(By.XPATH, '//div[contains(@class, "CountryList")]//a[starts-with(@href, "en/iso")]')
 
 # Extract country names from the href attribute value
 country_href = [element.get_attribute("href").split('/')[-1] for element in country_elements]
-
 
 list_links = []
 for name in country_href:
@@ -59,9 +60,6 @@ for name in country_href:
     
     if max_links and processed_links >= max_links:
         break
-
-
-myDataFrame = pd.DataFrame()
 
 # Open each link and fetch country name
 for link in list_links:
@@ -89,8 +87,6 @@ for link in list_links:
         # Define the output file path
         output_file = 'countries-selenium.csv'
 
-       
-
             # Create a dataframe for the country
         data = {
                 'CountryName': country_name,
@@ -101,7 +97,6 @@ for link in list_links:
                 data[indicator] = 'NA'
                 
         myDataFrame= pd.DataFrame(data) 
-
         
         # Write the data rows
         rowData = dict()

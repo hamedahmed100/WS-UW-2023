@@ -10,6 +10,7 @@ from time import sleep
 
 
 # Set up Chrome options
+# to open the browser in headless mode and prevenet the browser from opening
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run Chrome in headless mode
 chrome_options.add_argument("--disable-feature=NotificationPrompts")
@@ -23,15 +24,14 @@ driver = webdriver.Chrome(options=chrome_options)
 # Navigate to the website
 driver.get("http://data.un.org/")
 
-
-
-
+# define the master dataframe and other variables
+# Define the output file path
+output_file = 'countries-selenium.csv'
 master_df = pd.DataFrame()
 myDataFrame = pd.DataFrame()
 header_years = [2010,2015,2021]
-start_urls = ['http://data.un.org/']
 ScrapMin100 = True  # Set this to False to get all links
-max_links = 100 if ScrapMin100 else None
+max_links = 3 if ScrapMin100 else None
 processed_links = 0
 indicators = [
         'GDP: Gross domestic product',
@@ -64,10 +64,18 @@ for name in country_href:
 # Open each link and fetch country name
 for link in list_links:
     driver = webdriver.Chrome(options=chrome_options)
+    # here we open the link for each country and give it a sleep time of 2 seconds
     driver.get(link)
     sleep(2)
     try: 
-        # Find the details element containing the table
+
+        # Find the parent element of the country name text
+        parent_element = driver.find_element(By.XPATH, '//td[@class="countrytable"]')
+        
+        # Extract the country name from the parent element
+        country_name = parent_element.text
+
+        # Find the details element containing the table under economic indicators
         details_element = driver.find_element(By.XPATH, '//summary[text()="Economic indicators"]/ancestor::details')
 
         # Expand the details element to reveal the table
@@ -78,27 +86,24 @@ for link in list_links:
 
         # Find all rows in the table body
         rows = table_element.find_elements(By.XPATH, './/tbody/tr')
-        # Find the parent element of the country name text
-        parent_element = driver.find_element(By.XPATH, '//td[@class="countrytable"]')
+      
+        # Print the country name to make sure we are on the right track
+        print(country_name) 
         
-        # Extract the country name from the parent element
-        country_name = parent_element.text
-        print(country_name) # log the country name to the console
-        # Define the output file path
-        output_file = 'countries-selenium.csv'
 
-            # Create a dataframe for the country
+        # Create a dataframe for the country
         data = {
                 'CountryName': country_name,
                 'Year': header_years,
             }
 
+        # Add columns for each indicator
         for i, indicator in enumerate(indicators):
                 data[indicator] = 'NA'
                 
         myDataFrame= pd.DataFrame(data) 
         
-        # Write the data rows
+        # loop through the rows and extract the data and update the dataframe for each country
         rowData = dict()
         for row in rows:
             cells = row.find_elements(By.TAG_NAME, 'td')
@@ -108,13 +113,19 @@ for link in list_links:
                     rowData[ind] = [cell.text if cell.text != '...' else 'NA' for cell in cells[1:]]
 
  
-        # Write the data rows
+        # Update the dataframe with the data and concat it to the myDataFrame 
         for i in range(len(header_years)):
             for indicator, values in rowData.items():
                 myDataFrame.loc[i, indicator] = values[i]
+
+        # again print to make sure we are on the right track        
         print(myDataFrame)
-            # Append the individual country dataframe to the master dataframe
+        
+        # Append the individual country dataframe to the master dataframe
+        # our master dataframe will be converted to csv file at the end
         master_df = pd.concat([master_df, myDataFrame], ignore_index=True)
+
+    # here we are handling exceptions if the element is not found
     except NoSuchElementException:
         print("Element not found. Unable to locate Economic indicators.")
 

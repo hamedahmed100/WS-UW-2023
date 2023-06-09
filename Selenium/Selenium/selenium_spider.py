@@ -49,11 +49,11 @@ processed_links = 0
 country_elements = driver.find_elements(By.XPATH, '//div[contains(@class, "CountryList")]//a[starts-with(@href, "en/iso")]')
 
 # Extract country names from the href attribute value
-country_names = [element.get_attribute("href").split('/')[-1] for element in country_elements]
+country_href = [element.get_attribute("href").split('/')[-1] for element in country_elements]
 
 
 list_links = []
-for name in country_names:
+for name in country_href:
     list_links.append('http://data.un.org/en/iso/' + name)
     processed_links += 1
     

@@ -39,7 +39,6 @@ indicators = [
     ]
 
 header_years = [2010,2015,2021]
-name = 'country_spider'
 start_urls = ['http://data.un.org/']
 ScrapMin100 = True  # Set this to False to get all links
 max_links = 10 if ScrapMin100 else None

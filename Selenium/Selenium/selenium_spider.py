@@ -41,7 +41,7 @@ indicators = [
 header_years = [2010,2015,2021]
 start_urls = ['http://data.un.org/']
 ScrapMin100 = True  # Set this to False to get all links
-max_links = 10 if ScrapMin100 else None
+max_links = 100 if ScrapMin100 else None
 processed_links = 0
 
 

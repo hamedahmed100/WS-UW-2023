@@ -31,7 +31,7 @@ master_df = pd.DataFrame()
 myDataFrame = pd.DataFrame()
 header_years = [2010,2015,2021]
 ScrapMin100 = True  # Set this to False to get all links
-max_links = 3 if ScrapMin100 else None
+max_links = 100 if ScrapMin100 else None
 processed_links = 0
 indicators = [
         'GDP: Gross domestic product',
